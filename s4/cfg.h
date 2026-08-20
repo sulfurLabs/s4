@@ -13,7 +13,7 @@
 
 #define DT_BG 0xFF008080u  // win95/98 teal ig its a fallback
 
-#define WINDOW_TITLE_FONT "/system/fonts/ter-powerline-v12n.psf"
+#define WINDOW_TITLE_FONT "/system/fonts/terminus/ter-powerline-v12n.psf"
 
 // rubber band selection colors
 #define BAND_BORDER 0xCCA8A5A5u   // border

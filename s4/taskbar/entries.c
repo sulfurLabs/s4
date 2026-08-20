@@ -72,6 +72,19 @@ static tb_widget_t s_entries[] =
         .popup_h       = 0,
         .dirty         = 0,
     },
+    {
+        .type          = TB_WIDGET_APP,
+        .name          = "gears",
+        .text          = "gears",
+        .exec          = "/system/desktop/gears.elf",
+        .icon_path     = ICONS "exec.bmp",
+        .icon          = { .loaded = 0 },
+        .disp          = TB_DISP_ICON_TEXT,
+        .popup_pid     = -1,
+        .popup_w       = 0,
+        .popup_h       = 0,
+        .dirty         = 0,
+    },
 };
 
 #define ENTRIES_COUNT (int)(sizeof(s_entries) / sizeof(s_entries[0]))
