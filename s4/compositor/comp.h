@@ -10,6 +10,8 @@
 
 #pragma once
 
+#include "../../libbmp/bmp.h"
+
 unsigned int comp_get(int x, int y);
 
 
@@ -33,3 +35,5 @@ void comp_put_pixels(
 	int x, int y, int w, int h,
     const unsigned int *pixels
 );
+
+extern const bmp_target_t g_comp_target;

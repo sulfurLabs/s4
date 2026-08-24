@@ -120,8 +120,8 @@ int main(void)
     int internal_w = scr_w;
     int internal_h = scr_h;
     #if RENDERER_SCALING_ENABLED
-        internal_w = scr_w + scr_w / 2;
-        internal_h = scr_h + scr_h / 2;
+        internal_w = scr_w * RENDERER_SUPERSAMPLING_FACTOR;
+        internal_h = scr_h * RENDERER_SUPERSAMPLING_FACTOR;
     #endif
 
     printf(":: internal size: %d x %d\n", internal_w, internal_h);
@@ -174,7 +174,7 @@ int main(void)
     int poll_tick = 0;
     int first_frame = 1;
 
-    #define POLL_INTERVAL 4
+    #define POLL_INTERVAL 1
 
     for (;;)
     {

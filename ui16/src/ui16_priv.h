@@ -12,6 +12,9 @@
 
 #include "../include/ui16.h"
 
+#include <bmp.h>
+#include <stdlib.h>
+
 typedef struct
 {
     void (*drawRect)(int x, int y, int w, int h, unsigned int color, int radius);
@@ -31,6 +34,11 @@ void ui16__computeLayout(int screen_width ,int screen_height, const ui16_rendere
 void ui16__renderTree(const ui16_renderer_t *renderer);
 void ui16__setTargetBuffer(unsigned int *pixel_buffer, int buffer_width, int buffer_height);
 void ui16__inputEndFrame(void);
+
+void ui16__setBufferPixel(int x, int y, unsigned int color);
+unsigned int ui16__getBufferPixel(int x, int y);
+
+extern const bmp_target_t ui16__bmp_target;
 
 int ui16__targetBufferWidth(void);
 int ui16__targetBufferHeight(void);

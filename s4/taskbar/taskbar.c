@@ -191,7 +191,7 @@ static void draw_widget_content(
         int ix = slot_x + (icon_slot - draw_w) / 2;
         int iy = slot_y + (icon_slot - draw_h) / 2;
 
-        bmp_draw_scaled(img, ix, iy, draw_w, draw_h);
+        bmp_draw_scaled(&g_comp_target, img, ix, iy, draw_w, draw_h);
     }
 
     if (show_text)
@@ -313,7 +313,7 @@ void taskbar_draw(int mx, int my, int btn_down)
     for (int dy = 0; dy < TB_H; dy++) comp_fill(0, y + dy, w, 1, TB_BACKGROUND);
 
     // top border line
-    comp_fill(0, y, w, 1, TB_TOP_BORDER);
+    comp_fill(0, y, w, TB_TOP_BORDER_HEIGHT, TB_TOP_BORDER);
 
     draw_start_button(y, mx, my, btn_down);
 
@@ -323,7 +323,9 @@ void taskbar_draw(int mx, int my, int btn_down)
         int divider_h = TB_H - 8;
 
         comp_fill(divider_x, divider_y, 1, divider_h, TB_TOP_BORDER);
-        //comp_fill(divider_x + 1, divider_y, 1, divider_h, TB_LIGHT);
+        #if RENDER_SCALING_ENABLED == 1
+            comp_fill(divider_x + 1, divider_y, 1, divider_h, TB_LIGHT);
+        #endif
     }
 
     for (int i = 0; i < s_widget_count; i++)

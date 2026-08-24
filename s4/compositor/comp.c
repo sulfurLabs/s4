@@ -79,11 +79,31 @@ unsigned int comp_get(int x, int y)
     return surface_get(&g_surface, x, y);
 }
 
+unsigned int comp_BMP_target_get(void *ctx, int x, int y)
+{
+    (void)ctx;
+    return comp_get(x, y);
+}
+
 void comp_set(int x, int y, unsigned int c)
 {
     check_g_buf(__func__);
     surface_set(&g_surface, x, y, c);
 }
+
+void comp_BMP_target_set(void *ctx, int x, int y, unsigned int c)
+{
+    (void)ctx;
+    comp_set(x, y, c);
+}
+
+//needs libbmp
+const bmp_target_t g_comp_target =
+{
+    .set = comp_BMP_target_set,
+    .get = comp_BMP_target_get,
+    .ctx = NULL
+};
 
 void comp_put_row(int x, int y, const unsigned int *row, int len)
 {

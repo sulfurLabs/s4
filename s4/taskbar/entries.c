@@ -9,7 +9,7 @@
  */
 
 #include "entries.h"
-#include "../bg/bmp/bmp.h"
+#include "../../libbmp/bmp.h"
 #include "../bg/tga/tga.h"
 #include "../cfg.h"
 #include <string.h>
@@ -63,7 +63,7 @@ static tb_widget_t s_entries[] =
         .type          = TB_WIDGET_APP,
         .name          = "welcome",
         .text          = "welcome",
-        .exec          = "/system/desktop/welcome.elf",
+        .exec          = SYSTEM "welcome.elf",
         .icon_path     = ICONS "welcome.bmp",
         .icon          = { .loaded = 0 },
         .disp          = TB_DISP_ICON_ONLY,
@@ -76,8 +76,21 @@ static tb_widget_t s_entries[] =
         .type          = TB_WIDGET_APP,
         .name          = "gears",
         .text          = "gears",
-        .exec          = "/system/desktop/gears.elf",
+        .exec          = SYSTEM "gears.elf",
         .icon_path     = ICONS "exec.bmp",
+        .icon          = { .loaded = 0 },
+        .disp          = TB_DISP_ICON_TEXT,
+        .popup_pid     = -1,
+        .popup_w       = 0,
+        .popup_h       = 0,
+        .dirty         = 0,
+    },
+    {
+        .type          = TB_WIDGET_APP,
+        .name          = "Terminal",
+        .text          = "Terminal",
+        .exec          = SYSTEM "terminal.elf",
+        .icon_path     = NULL,
         .icon          = { .loaded = 0 },
         .disp          = TB_DISP_ICON_TEXT,
         .popup_pid     = -1,

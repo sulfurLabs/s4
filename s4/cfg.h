@@ -7,6 +7,7 @@
 // scaling settings
 #define RENDERER_SCALING_ENABLED 0
 #define RENDERER_SUPERSAMPLING_FACTOR 2
+#define RENDERER_ENABLE_BACKGROUND_BS 0
 #define DARK_MODE 1
 #define DT_ENABLE_RESIZING 1
 #define ENABLE_TILING 0
@@ -36,6 +37,9 @@
     #define TB_START_H 34
     #define TB_STARTBUTTON_PAD_LEFT 8
     #define TB_STARTBUTTON_PAD_RIGHT 10
+    #define TB_TOP_BORDER_HEIGHT 2
+
+    #define BUTTON_TOP_BORDER_HEIGHT 4
 
     #define MAX_APPICON_SIZE 34
 
@@ -47,6 +51,9 @@
     #define DT_TITLE_H  26 // tot. inc. high
     #define DT_TITLE_PB 6  // pad. top
     #define DT_BORDER   2  // border width
+
+    #undef RENDERER_ENABLE_BACKGROUND_BS
+    #define RENDERER_ENABLE_BACKGROUND_BS 1
 #else
     // taskbar
     #define TB_H 40
@@ -59,6 +66,9 @@
     #define TB_START_H 22
     #define TB_STARTBUTTON_PAD_LEFT 5
     #define TB_STARTBUTTON_PAD_RIGHT 7
+    #define TB_TOP_BORDER_HEIGHT 1
+
+    #define BUTTON_TOP_BORDER_HEIGHT 2
 
     #define MAX_APPICON_SIZE 21
 
@@ -76,6 +86,7 @@
 #define REBOOT_LAUNCHPAD_PATH "/bin/reboot.elf"
 #define DEFAULT_ICON SYSTEM "icons/exec.bmp"
 #define STARTBUTTON_ICON SYSTEM "icons/start.bmp"
+#define SMENU_PATH SYSTEM "smenu.elf"
 
 #if DARK_MODE == 1
     #define TB_BACKGROUND  0xFF202020u

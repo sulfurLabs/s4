@@ -227,24 +227,27 @@ void bmp_free(bmp_image_t *img)
 }
 
 void bmp_draw(
+    const bmp_target_t *target,
 	const bmp_image_t *img,
 	int x,
 	int y
 ){
-    bmp_draw_ex(img, x, y, 0, 0, -1, 0, 255);
+    bmp_draw_ex(target, img, x, y, 0, 0, -1, 0, 255);
 }
 
 void bmp_draw_scaled(
+    const bmp_target_t *target,
 	const bmp_image_t *img,
     int x,
     int y,
     int w,
     int h
 ){
-    bmp_draw_ex(img, x, y, w, h, -1, 0, 255);
+    bmp_draw_ex(target, img, x, y, w, h, -1, 0, 255);
 }
 
 void bmp_draw_ex(
+    const bmp_target_t *target,
 	const bmp_image_t *img,
     int x,
     int y,
@@ -256,6 +259,7 @@ void bmp_draw_ex(
 ) {
     //static unsigned int row_buf[BMP_ROW_BUF_W];
 
+    if (!target || !target->set || !target->get) return;
     if (!img || !img->pixels) return;
     if (alpha == 0) return; // fully transparent 0x00
 
@@ -296,12 +300,12 @@ void bmp_draw_ex(
 
             if (a == 255)
             {
-                comp_set(abs_x, abs_y, pix);
+                target->set(target->ctx, abs_x, abs_y, pix);
                 continue;
             }
 
             // partial alpha
-            unsigned int bgc = comp_get(abs_x, abs_y);
+            unsigned int bgc = target->get(target->ctx, abs_x, abs_y);
 
             unsigned int sr = (pix  >> 16) & 0xFF;
             unsigned int sg = (pix  >> 8) & 0xFF;
@@ -315,7 +319,7 @@ void bmp_draw_ex(
             unsigned int rg = (sg * a + bg2 * (255 - a)) / 255;
             unsigned int rb = (sb * a + bb  * (255 - a)) / 255;
 
-            comp_set(abs_x, abs_y, 0xFF000000u | (rr << 16) | (rg << 8) | rb);
+            target->set(target->ctx, abs_x, abs_y, 0xFF000000u | (rr << 16) | (rg << 8) | rb);
         }
     }
 }

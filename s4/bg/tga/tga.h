@@ -10,7 +10,7 @@
 
 #pragma once
 
-#include "../bmp/bmp.h"
+#include "../../../libbmp/bmp.h"
 
 int  tga_load(const char *path, bmp_image_t *img);
 void tga_free(bmp_image_t *img);

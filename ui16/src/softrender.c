@@ -70,6 +70,25 @@ static void ui16__setPixel(int x, int y, unsigned int color)
     target_buffer[y * target_buffer_width + x] = color;
 }
 
+void ui16__setBufferPixel(int x, int y, unsigned int color)
+{
+    ui16__setPixel(x, y, color);
+}
+
+static unsigned int ui16__getPixel(int x, int y)
+{
+    if (!target_buffer) return 0;
+    if (x < 0 || x >= target_buffer_width) return 0;
+    if (y < 0 || y >= target_buffer_height) return 0;
+
+    return target_buffer[y * target_buffer_width + x];
+}
+
+unsigned int ui16__getBufferPixel(int x, int y)
+{
+    ui16__getBufferPixel(x, y);
+}
+
 static void ui16__softwareDrawText(int x, int y, const char *text, unsigned int color, ui16_font_t font)
 {
     if (!target_buffer) return;

@@ -524,7 +524,14 @@ int input_drain_keyboard(int kfd)
     {
         got = 1;
 
-        if (ev.type != INPUT_EV_KEY) continue;
+        if (
+            ev.value != 0 &&
+            (ev.modifiers & KBD_MOD_SHIFT) &&
+            (ev.code == 's' || ev.code == 'S' || ev.code == 0x1F)
+        ) {
+            spawn("/system/desktop/smenu.elf");
+            continue;
+        }
 
         #if ENABLE_TILING
             if (

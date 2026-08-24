@@ -11,7 +11,7 @@
 #pragma once
 
 #include <sys/types.h>
-#include "../bg/bmp/bmp.h"
+#include "../../libbmp/bmp.h"
 
 // widget types
 #define TB_WIDGET_NONE          0

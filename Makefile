@@ -18,13 +18,15 @@ OS_LIBS     ?= $(OS_PATH)user/libs/
 LIBDESKTOP  := libdesktop/
 UI16 := ui16/
 LIBPSF := libpsf/
+LIBBMP := libbmp/
 
 CFLAGS := -ffreestanding -nostdlib -fno-builtin -fno-stack-protector       \
-          -fno-PIE -fno-pic -m64 -march=x86-64 -mno-sse -mno-sse2          \
+          -fno-PIE -fno-pic -m64 -march=x86-64                             \
           -mno-mmx -mno-red-zone -Wall -Wextra -std=gnu11 -D__sulfur__ -O2 \
           -I$(LIBC)/include                                                \
           -I$(LIBDESKTOP)                                                  \
-          -I$(LIBPSF)
+          -I$(LIBPSF)                                                      \
+          -I$(LIBBMP)
 
 LDFLAGS := -nostdlib -static -no-pie -T user.ld
 
@@ -40,7 +42,6 @@ OBJS := build/desktop.o \
         build/compositor/scale.o \
         build/render/render_target.o \
         build/cmd/cmd.o \
-        build/bg/bmp/bmp.o \
         build/bg/tga/tga.o \
         build/bg/bg.o \
         build/win/win.o \
@@ -73,7 +74,6 @@ dirs:
 	mkdir -p build/wm
 	mkdir -p build/compositor
 	mkdir -p build/bg
-	mkdir -p build/bg/bmp
 	mkdir -p build/bg/tga
 	mkdir -p build/win
 	mkdir -p build/cursor
@@ -92,8 +92,18 @@ build/s4.elf: dirs $(OBJS) $(LIBC)/build/crt0.o $(LIBC)/build/libc.a $(LIBDESKTO
 	@$(MAKE) -C libpsf
 	@echo "libpsf was succesfully built!"
 
+	@echo "building libbmp now..."
+	@$(MAKE) -C libbmp
+	@echo "libbmp was succesfully built!"
+
 	@echo "Building s4 now..."
-	$(LD) $(LDFLAGS) $(LIBC)/build/crt0.o $(OBJS) $(LIBDESKTOP)/build/libdesktop.a $(LIBPSF)/build/psf.a $(LIBC)/build/libc.a -o $@
+	$(LD) $(LDFLAGS) $(LIBC)/build/crt0.o $(OBJS)  \
+		$(LIBDESKTOP)/build/libdesktop.a           \
+		$(LIBPSF)/build/psf.a                      \
+		$(LIBBMP)/build/libbmp.a                   \
+		$(LIBC)/build/libc.a                       \
+		-o $@
+
 	@echo "s4 was succesfully built!"
 
 	@echo "building libdesktop now..."
@@ -112,6 +122,7 @@ build/s4.elf: dirs $(OBJS) $(LIBC)/build/crt0.o $(LIBC)/build/libc.a $(LIBDESKTO
 	@mkdir -p $(OS_LIBS)$(UI16)
 	@mkdir -p $(OS_LIBS)$(LIBDESKTOP)
 	@mkdir -p $(OS_LIBS)$(LIBPSF)
+	@mkdir -p $(OS_LIBS)$(LIBBMP)
 	@cp build/s4.elf $(ROOTFS_PATH)desktop.elf
 	@cp libdesktop/build/libdesktop.a $(OS_LIBS)$(LIBDESKTOP)libdesktop.a
 	@cp libdesktop/libdesktop.h $(OS_LIBS)$(LIBDESKTOP)libdesktop.h
@@ -121,6 +132,8 @@ build/s4.elf: dirs $(OBJS) $(LIBC)/build/crt0.o $(LIBC)/build/libc.a $(LIBDESKTO
 	@cp ui16/include/ui16buttons.h $(OS_LIBS)$(UI16)ui16buttons.h
 	@cp libpsf/psf.h $(OS_LIBS)$(LIBPSF)psf.h
 	@cp libpsf/build/psf.a $(OS_LIBS)$(LIBPSF)psf.a
+	@cp libbmp/bmp.h $(OS_LIBS)$(LIBBMP)bmp.h
+	@cp libbmp/build/libbmp.a $(OS_LIBS)$(LIBBMP)libbmp.a
 	@cp build/s4.cpio $(OS_DSK_PATH)rd/system/s4.cpio
 
 
@@ -133,7 +146,6 @@ build/compositor/fb_backend.o:      s4/compositor/fb_backend.c     ; $(CC) $(CFL
 build/compositor/surface.o:         s4/compositor/surface.c        ; $(CC) $(CFLAGS) -c $< -o $@
 build/compositor/scale.o:           s4/compositor/scale.c          ; $(CC) $(CFLAGS) -c $< -o $@
 build/render/render_target.o:       s4/render/render_target.c      ; $(CC) $(CFLAGS) -c $< -o $@
-build/bg/bmp/bmp.o:                 s4/bg/bmp/bmp.c                ; $(CC) $(CFLAGS) -c $< -o $@
 build/bg/tga/tga.o:                 s4/bg/tga/tga.c                ; $(CC) $(CFLAGS) -c $< -o $@
 build/bg/bg.o:                      s4/bg/bg.c                     ; $(CC) $(CFLAGS) -c $< -o $@
 build/win/win.o:                    s4/win/win.c                   ; $(CC) $(CFLAGS) -c $< -o $@

@@ -55,8 +55,20 @@ char ui16_keyToChar(unsigned int keycode, int shift)
         case INPUT_KEY_SPACE: return ' ';
         case INPUT_KEY_MINUS: return shift ? '_' : '-';
 
-        case INPUT_KEY_DOT: return '.';
-        case INPUT_KEY_COMMA: return ',';
+        case INPUT_KEY_DOT: return shift ? '>' : '.';
+        case INPUT_KEY_COMMA: return shift ? '<' : ',';
+        case INPUT_KEY_EQUAL: return shift ? '+' : '=';
+        case INPUT_KEY_LBRACKET: return shift ? '{' : '[';
+        case INPUT_KEY_RBRACKET: return shift ? '}' : ']';
+        case INPUT_KEY_BACKSLASH: return shift ? '|' : '\\';
+        case INPUT_KEY_SEMICOLON: return shift ? ':' : ';';
+        case INPUT_KEY_APOSTROPHE: return shift ? '"' : '\'';
+        case INPUT_KEY_GRAVE: return shift ? '~' : '`';
+        case INPUT_KEY_SLASH: return shift ? '?' : '/';
+        case INPUT_KEY_ENTER:
+        case INPUT_KEY_KP_ENTER: return '\n';
+        case INPUT_KEY_BACKSPACE: return '\b';
+        case INPUT_KEY_TAB: return '\t';
 
         default: return 0;
     }

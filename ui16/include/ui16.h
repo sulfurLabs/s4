@@ -303,6 +303,11 @@ ui16_node_t *ui16__labelStyled(ui16_style_t label_style, const char *label_text)
 
 void ui16_input(int mouse_x, int mouse_y, int mouse_down);
 
+typedef struct bmp_image_s bmp_image_t;
+
+void ui16_drawBmp(const char *path, int x, int y);
+void ui16_drawBmpScaled(const char *path, int x, int y, int w, int h);
+
 int ui16_hovered(const ui16_node_t *node);
 int ui16_pressed(const ui16_node_t *node);
 int ui16_clicked(const ui16_node_t *node);
