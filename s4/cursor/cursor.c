@@ -46,6 +46,8 @@ void cur_set_type(cur_type_t type) {
 
 // bg save buffer big enough for largest cursor
 static unsigned int bg_save[CUR_RESIZE_W * CUR_RESIZE_H];
+static int bg_save_w = 0;
+static int bg_save_h = 0;
 static int bg_valid = 0;
 static int old_x = 0;
 static int old_y = 0;
@@ -68,7 +70,11 @@ void cur_init(int fb_fd, int w, int h)
     g_fd = fb_fd;
     g_scr_w = w;
     g_scr_h = h;
+    bg_save_w = 0;
+    bg_save_h = 0;
     bg_valid = 0;
+    old_x = 0;
+    old_y = 0;
 }
 
 static void flush_rect(int x, int y, int w, int h)
@@ -79,7 +85,13 @@ static void flush_rect(int x, int y, int w, int h)
 void cur_undo_from_backbuf(void)
 {
     if (!bg_valid) return;
-    comp_put_pixels(old_x, old_y, cur_w(), cur_h(), bg_save);
+    comp_put_pixels(
+        old_x,
+        old_y,
+        bg_save_w,
+        bg_save_h,
+        bg_save
+    );
 }
 
 void cur_bake(int x, int y)
@@ -90,13 +102,18 @@ void cur_bake(int x, int y)
 
     clamp(&x, &y);
 
-    for (int row = 0; row < ch; row++) {
-        for (int col = 0; col < cw; col++) {
+    for (int row = 0; row < ch; row++)
+    {
+        for (int col = 0; col < cw; col++)
+        {
             bg_save[row * cw + col] = comp_get(x + col, y + row);
         }
     }
-    for (int row = 0; row < ch; row++) {
-        for (int col = 0; col < cw; col++) {
+
+    for (int row = 0; row < ch; row++)
+    {
+        for (int col = 0; col < cw; col++)
+        {
             unsigned int c = px[row * cw + col];
             if (c >> 24) comp_set(x + col, y + row, c);
         }
@@ -104,6 +121,8 @@ void cur_bake(int x, int y)
 
     old_x = x;
     old_y = y;
+    bg_save_w = cw;
+    bg_save_h = ch;
     bg_valid = 1;
 }
 
@@ -111,17 +130,17 @@ void cur_erase_fb(void)
 {
     if (!bg_valid || g_fd < 0) return;
     comp_put_pixels(
-    	old_x,
-     	old_y,
-      	cur_w(),
-       	cur_h(),
+        old_x,
+        old_y,
+        bg_save_w,
+        bg_save_h,
         bg_save
     );
     flush_rect(
-    	old_x,
-     	old_y,
-      	cur_w(),
-       	cur_h()
+        old_x,
+        old_y,
+        bg_save_w,
+        bg_save_h
     );
     bg_valid = 0;
 }
@@ -136,13 +155,18 @@ void cur_draw_fb(int x, int y)
 
     clamp(&x, &y);
 
-    for (int row = 0; row < ch; row++) {
-        for (int col = 0; col < cw; col++) {
+    for (int row = 0; row < ch; row++)
+    {
+        for (int col = 0; col < cw; col++)
+        {
             bg_save[row * cw + col] = comp_get(x + col, y + row);
         }
     }
-    for (int row = 0; row < ch; row++) {
-        for (int col = 0; col < cw; col++) {
+
+    for (int row = 0; row < ch; row++)
+    {
+        for (int col = 0; col < cw; col++)
+        {
             unsigned int c = px[row * cw + col];
             if (c >> 24) comp_set(x + col, y + row, c);
         }
@@ -152,6 +176,8 @@ void cur_draw_fb(int x, int y)
 
     old_x = x;
     old_y = y;
+    bg_save_w = cw;
+    bg_save_h = ch;
     bg_valid = 1;
 }
 

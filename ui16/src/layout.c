@@ -37,6 +37,15 @@ static void ui16__measureNode(ui16_node_t *node, const ui16_renderer_t *renderer
     ) {
         renderer->measureText(node->text, ui16__resolveFont(node), &natural_width, &natural_height);
     }
+    else if (node->kind == UI16_NODE_IMAGE && node->text)
+    {
+        const bmp_image_t *img = ui16__imageLoad(node->text);
+        if (img)
+        {
+            natural_width = img->width;
+            natural_height = img->height;
+        }
+    }
 
     int is_row_layout = (node->style.layout == UI16_LAYOUT_ROW);
     int main_sum = 0;
@@ -174,14 +183,32 @@ static void ui16__layoutChildren(ui16_node_t *parent_node, const ui16_renderer_t
         ui16_size_t cross_size_style = is_row_layout ? child->style.height : child->style.width;
 
         int child_main;
-        if (main_size_style.kind == UI16_SIZE_FILL && wrap_enabled)
+        if (main_size_style.kind == UI16_SIZE_FILL)
         {
-            int min_v = is_row_layout ? child->style.min_width : child->style.min_height;
-            int max_v = is_row_layout ? child->style.max_width : child->style.max_height;
-            child_main = ui16__clampInt(is_row_layout ? child->natural_width : child->natural_height, min_v, max_v);
-        } else
+            if (wrap_enabled)
+            {
+                int min_v = is_row_layout ? child->style.min_width : child->style.min_height;
+                int max_v = is_row_layout ? child->style.max_width : child->style.max_height;
+
+                child_main = ui16__clampInt(
+                    is_row_layout ? child->natural_width : child->natural_height,
+                    min_v,
+                    max_v
+                );
+            }
+            else
+            {
+                child_main = 0;
+            }
+        }
+        else
         {
-            child_main = ui16__resolveSize(main_size_style, main_axis_total, child, is_row_layout);
+            child_main = ui16__resolveSize(
+                main_size_style,
+                main_axis_total,
+                child,
+                is_row_layout
+            );
         }
 
         int child_cross = ui16__resolveSize(cross_size_style, is_row_layout ? content_height : content_width, child, !is_row_layout);

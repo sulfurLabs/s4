@@ -86,44 +86,96 @@ static unsigned int ui16__getPixel(int x, int y)
 
 unsigned int ui16__getBufferPixel(int x, int y)
 {
-    ui16__getBufferPixel(x, y);
+    return ui16__getPixel(x, y);
 }
 
-static void ui16__softwareDrawText(int x, int y, const char *text, unsigned int color, ui16_font_t font)
+static void ui16__softwareDrawText(
+    int x,
+    int y,
+    const char *text,
+    unsigned int color,
+    ui16_font_t font
+)
 {
     if (!target_buffer) return;
 
     int cursor_x = x;
-    int row_index = 0;
-    int character_index = 0;
-    int col_index = 0;
+    int glyph_width = UI16_GLYPH_WIDTH;
+    int glyph_height = UI16_GLYPH_HEIGHT;
 
-    for (character_index = 0; text[character_index]; character_index++)
+    if (font.kind == UI16_FONT_PSF)
+    {
+        glyph_width = ui16__psfWidth();
+        glyph_height = ui16__psfHeight();
+
+        if (!ui16__psfLoad(font.path))return;
+        if (glyph_width <= 0 || glyph_height <= 0) return;
+        if (glyph_width > 32) glyph_width = 32;
+    }
+
+
+    for (int character_index = 0; text[character_index]; character_index++)
     {
         unsigned char current_character = (unsigned char)text[character_index];
 
-        for (row_index = 0; row_index < UI16_GLYPH_HEIGHT; row_index++)
+        for (int row_index = 0; row_index < glyph_height; row_index++)
         {
-            unsigned short row_bits = ui16__glyphRow(font, current_character, row_index);
+            uint32_t row_bits = ui16__glyphRow(
+                font,
+                current_character,
+                row_index
+            );
 
-            for (col_index = 0; col_index < UI16_GLYPH_WIDTH; col_index++)
+            for (int col_index = 0; col_index < glyph_width; col_index++)
             {
-                if (row_bits & (1u << col_index)) ui16__setPixel(cursor_x + col_index, y + row_index, color);
+                if (row_bits & (1u << col_index))
+                {
+                    ui16__setPixel(
+                        cursor_x + col_index,
+                        y + row_index,
+                        color
+                    );
+                }
             }
         }
 
-        cursor_x += UI16_GLYPH_WIDTH;
+        cursor_x += glyph_width;
     }
 }
 
-static void ui16__softwareMeasureText(const char *text, ui16_font_t font, int *out_width, int *out_height)
-{
-    (void)font;
-
+static void ui16__softwareMeasureText(
+    const char *text,
+    ui16_font_t font,
+    int *out_width,
+    int *out_height
+) {
     int character_count = ui16__stringLength(text);
 
-    *out_width = character_count * UI16_GLYPH_WIDTH;
-    *out_height = UI16_GLYPH_HEIGHT;
+    int glyph_width = UI16_GLYPH_WIDTH;
+    int glyph_height = UI16_GLYPH_HEIGHT;
+
+    if (font.kind == UI16_FONT_PSF)
+    {
+        if (!ui16__psfLoad(font.path))
+        {
+            *out_width = 0;
+            *out_height = 0;
+            return;
+        }
+
+        glyph_width = ui16__psfWidth();
+        glyph_height = ui16__psfHeight();
+
+        if (glyph_width <= 0 || glyph_height <= 0)
+        {
+            *out_width = 0;
+            *out_height = 0;
+            return;
+        }
+    }
+
+    *out_width = character_count * glyph_width;
+    *out_height = glyph_height;
 }
 
 static const ui16_renderer_t software_renderer_instance =

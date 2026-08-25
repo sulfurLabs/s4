@@ -23,7 +23,7 @@ static void ui16__bmpTargetSet(void *ctx, int x, int y, unsigned int color)
 static unsigned int ui16__bmpTargetGet(void *ctx, int x, int y)
 {
     (void)ctx;
-    ui16__getBufferPixel(x, y);
+    return ui16__getBufferPixel(x, y);
 }
 
 const bmp_target_t ui16__bmp_target =

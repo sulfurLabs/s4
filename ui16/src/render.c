@@ -69,6 +69,22 @@ static void ui16__renderSelf(ui16_node_t *node, const ui16_renderer_t *renderer)
         );
     }
 
+    if (node->kind == UI16_NODE_IMAGE)
+    {
+        const bmp_image_t *img = ui16__imageLoad(node->text);
+        if (img)
+        {
+            bmp_draw_scaled(
+                &ui16__bmp_target,
+                img,
+                node->box_x,
+                node->box_y,
+                node->box_width,
+                node->box_height
+            );
+        }
+    }
+
     if (node->style.border_width > 0 && renderer->drawRect)
     {
         int bw = node->style.border_width;

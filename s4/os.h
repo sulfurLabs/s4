@@ -41,8 +41,8 @@
     #define SYSTEM "/home/s4/" //the path to the desktop in the system
     #define CFGFILE   SYSTEM "desktop.ui16"
     #define ENTRYFILE SYSTEM "entries.json"
-#elif __ascentos__
-    #define GREETING "AscentOS"
+#elif __avory__
+    #define GREETING "AvoryOS"
     #define SHM_DEV      "/dev/shm0"
     #define MOUSE_DEV    "/dev/mouse"
     #define KEYBOARD_DEV "/dev/kbd"

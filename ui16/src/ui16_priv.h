@@ -14,6 +14,7 @@
 
 #include <bmp.h>
 #include <stdlib.h>
+#include <stdint.h>
 
 typedef struct
 {
@@ -39,6 +40,7 @@ void ui16__setBufferPixel(int x, int y, unsigned int color);
 unsigned int ui16__getBufferPixel(int x, int y);
 
 extern const bmp_target_t ui16__bmp_target;
+const bmp_image_t *ui16__imageLoad(const char *path);
 
 int ui16__targetBufferWidth(void);
 int ui16__targetBufferHeight(void);
@@ -52,4 +54,12 @@ ui16_font_t ui16__resolveFont(ui16_node_t *node);
 #define UI16_GLYPH_WIDTH 8
 #define UI16_GLYPH_HEIGHT 12
 
-unsigned short ui16__glyphRow(ui16_font_t font, unsigned char character, int row);
+uint32_t ui16__glyphRow(
+    ui16_font_t font,
+    unsigned char character,
+    int row
+);
+
+int ui16__psfLoad(const char *path);
+int ui16__psfWidth(void);
+int ui16__psfHeight(void);
