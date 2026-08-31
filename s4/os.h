@@ -23,7 +23,9 @@
     #define KEYBOARD_DEV "/dev/kbd0"
     #define FRAMEBUFFER_DEV "/dev/fb0"
 
-    #define SYSTEM "/system/desktop/" //the path to the desktop in the system
+    //todo find current username
+    #define APPPATH "/users/pc/applications/"
+    #define SYSTEM "/users/pc/applications/desktop/" //the path to the desktop in the system
     #define CFGFILE   SYSTEM "desktop.ui16"
     #define ENTRYFILE SYSTEM "entries.json"
 #elif __nullos__

@@ -15,6 +15,7 @@
 #include <unistd.h>
 #include <stdio.h>
 #include "../cfg.h"
+#include <string.h>
 
 static fb_backend_t g_fb;
 static surface_t    g_surface;
@@ -42,22 +43,33 @@ void comp_init(int fb_fd, int requested_internal_width, int requested_internal_h
 
     #if RENDERER_SCALING_ENABLED
         printf(":: comp: rendered scaling is enabled!\n");
-
-        if (!surface_alloc(&g_surface, requested_internal_width, requested_internal_height))
-        {
-            printf(
-                ":: comp: internal_render_surface allocation failed\n"
-                "   we will fall back to real framebuffer :(\n"
-            );
-            surface_alias(&g_surface, g_fb.pixels, g_fb.width, g_fb.height, g_fb.stride);
-        }
-
-	    //g_buf = g_internal_render_surface;
+        int bb_w = requested_internal_width;
+        int bb_h = requested_internal_height;
     #else
         (void)requested_internal_width;
         (void)requested_internal_height;
-        surface_alias(&g_surface, g_fb.pixels, g_fb.width, g_fb.height, g_fb.stride);
+        int bb_w = g_fb.width;
+        int bb_h = g_fb.height;
     #endif
+
+    printf(
+        ":: comp: allocating RAM backbuffer %dx%d (double buffering, fb0 is direct HW now)\n",
+        bb_w, bb_h
+    );
+
+    if (!surface_alloc(&g_surface, bb_w, bb_h))
+    {
+        printf(
+            ":: comp: backbuffer allocation FAILED\n"
+            "   falling back to direct HW framebuffer writes -\n"
+            "   this WILL be slow, expect uncached read stalls!\n"
+        );
+        surface_alias(&g_surface, g_fb.pixels, g_fb.width, g_fb.height, g_fb.stride);
+    }
+    else
+    {
+        printf(":: comp: double buffering active, drawing into RAM backbuffer\n");
+    }
 
     g_buf_shadow = g_surface.pixels;
 }
@@ -123,13 +135,58 @@ void comp_put_pixels(int x, int y, int w, int h, const unsigned int *pixels)
     surface_put_pixels(&g_surface, x, y, w, h, pixels);
 }
 
+static void blit_backbuffer_rect(int x, int y, int w, int h)
+{
+    if (!g_fb.pixels || !g_surface.pixels) return;
+    if (w <= 0 || h <= 0) return;
+
+    int x0 = x < 0 ? 0 : x;
+    int y0 = y < 0 ? 0 : y;
+    int x1 = x + w;
+    int y1 = y + h;
+
+    printf("[COMP] blit %dx%d at %d,%d\n", w, h, x, y); // why??
+    //the damage system gives us large parts of the screen
+    // while it should only be some pixels
+    // but this gives us per screen proly 2MB but if we have like 60 fps thats like 120MB
+
+    if (x1 > g_surface.width)  x1 = g_surface.width;
+    if (y1 > g_surface.height) y1 = g_surface.height;
+    if (x1 > (int)g_fb.width)  x1 = (int)g_fb.width;
+    if (y1 > (int)g_fb.height) y1 = (int)g_fb.height;
+
+    if (x0 >= x1 || y0 >= y1) return;
+
+    int row_len = x1 - x0;
+
+    for (int ry = y0; ry < y1; ry++)
+    {
+        unsigned int *src = g_surface.pixels + (unsigned)ry * g_surface.stride + (unsigned)x0;
+        unsigned int *dst = g_fb.pixels + (unsigned)ry * g_fb.stride + (unsigned)x0;
+
+        memcpy(dst, src, (size_t)row_len * sizeof(unsigned int));
+    }
+}
+
 void comp_flush_rect(int internal_x, int internal_y, int internal_width, int internal_height)
 {
     check_g_buf(__func__);
     if (!g_surface.pixels || g_fb.fd < 0) return;
 
+    if (g_surface.pixels == g_fb.pixels)
+    {
+        fb_backend_flush_rect(
+            &g_fb,
+            (unsigned)internal_x,
+            (unsigned)internal_y,
+            (unsigned)internal_width,
+            (unsigned)internal_height
+        );
+        return;
+    }
+
     #if RENDERER_SCALING_ENABLED
-        if (g_surface.pixels != g_fb.pixels && g_fb.pixels)
+        if (g_fb.pixels)
         {
             int px0 = internal_x * g_fb.width / g_surface.width;
             int py0 = internal_y * g_fb.height / g_surface.height;
@@ -165,6 +222,8 @@ void comp_flush_rect(int internal_x, int internal_y, int internal_width, int int
             return;
         }
     #else
+        blit_backbuffer_rect(internal_x, internal_y, internal_width, internal_height);
+
         fb_backend_flush_rect(
             &g_fb,
             (unsigned)internal_x,

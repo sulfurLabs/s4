@@ -526,18 +526,18 @@ int input_drain_keyboard(int kfd)
 
         if (
             ev.value != 0 &&
-            (ev.modifiers & KBD_MOD_SHIFT) &&
+            (ev.modifiers & INPUT_MOD_SHIFT) &&
             (ev.code == 's' || ev.code == 'S' || ev.code == 0x1F)
         ) {
-            spawn("/system/desktop/smenu.elf");
+            //spawn("/system/bin/smenu.elf");
             continue;
         }
 
         #if ENABLE_TILING
             if (
                 ev.value != 0 &&
-                (ev.modifiers & KBD_MOD_SHIFT) &&
-                (ev.modifiers & KBD_MOD_CTRL)  &&
+                (ev.modifiers & INPUT_MOD_SHIFT) &&
+                (ev.modifiers & INPUT_MOD_CTRL)  &&
                 g_focused_pid > 0
             ) {
                 int dx = 0, dy = 0;

@@ -13,7 +13,7 @@ LIBC   ?= include/libc
 
 OS_PATH     ?= ~/sulfurLabs/sulfurOS/
 OS_DSK_PATH ?= $(OS_PATH)dsk/
-ROOTFS_PATH ?= $(OS_DSK_PATH)rd/system/desktop/
+ROOTFS_PATH ?= $(OS_DSK_PATH)rdh/user_id/applications/desktop/
 OS_LIBS     ?= $(OS_PATH)user/libs/
 LIBDESKTOP  := libdesktop/
 UI16 := ui16/
@@ -134,7 +134,7 @@ build/s4.elf: dirs $(OBJS) $(LIBC)/build/crt0.o $(LIBC)/build/libc.a $(LIBDESKTO
 	@cp libpsf/build/psf.a $(OS_LIBS)$(LIBPSF)psf.a
 	@cp libbmp/bmp.h $(OS_LIBS)$(LIBBMP)bmp.h
 	@cp libbmp/build/libbmp.a $(OS_LIBS)$(LIBBMP)libbmp.a
-	@cp build/s4.cpio $(OS_DSK_PATH)rd/system/s4.cpio
+	@cp build/s4.cpio $(OS_DSK_PATH)rdh/user_id/extend/s4.cpio
 
 
 build/desktop.o:                    s4/desktop.c                   ; $(CC) $(CFLAGS) -c $< -o $@

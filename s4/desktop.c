@@ -3,6 +3,7 @@
 #include <fcntl.h>
 #include <string.h>
 #include <stdlib.h>
+#include <sys/stat.h>
 
 #include "cfg.h"
 #include "compositor/comp.h"
